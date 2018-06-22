@@ -1,0 +1,18 @@
+{
+  "name": "borg-backup-and-email",
+  "version": "0.0.1",
+  "description": "Note: this is not really intended to be used in production. Use this instead: https://github.com/vesparny/borgjs",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Darkle/borg-backup-and-email.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Darkle/borg-backup-and-email/issues"
+  },
+  "homepage": "https://github.com/Darkle/borg-backup-and-email#readme"
+}
