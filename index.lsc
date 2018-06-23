@@ -27,7 +27,7 @@ borgCreateParams = [
   `${ create.repository }::${ create.archivePrefix || os.hostname() }-${ prettyDate() }`,
   ...create.foldersToBackup,
 ]
-logType = create?.log?.type
+logType = create.log?.type
 
 if logType === 'file': borgCreateParams.push(` >> ${ create.log.destination } 2>&1`)
 
