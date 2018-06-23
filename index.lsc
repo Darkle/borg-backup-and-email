@@ -60,6 +60,6 @@ isError(err) -> err instanceof Error
 prettyDate() -> dateFormat(new Date(), 'yyyy-mm-dd-HHMMss')
 
 generateMessageTitle(result) ->
-  if !isError(result): 'Borg Backup Completed Successfully 😎'
-  else: 'Borg Backup Encountered An Error 💩'
+  if isError(result): 'Borg Backup Encountered An Error 💩'
+  else: 'Borg Backup Completed Successfully 😎'
 
