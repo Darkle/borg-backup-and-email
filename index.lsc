@@ -9,7 +9,7 @@ import notifier from 'node-notifier'
 import { stringify } from 'q-i'
 import mailgunjs from 'mailgun-js'
 
-import { create } from './borg-config.json5'
+import { create } from './borg.config.json5'
 
 pExec = promisify(exec)
 mailgun = mailgunjs({
