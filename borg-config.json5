@@ -1,0 +1,37 @@
+
+{
+  create: {
+    options: [
+    //  '--verbose',
+    //  '--filter AME',
+    //  '--list',
+     '--stats',
+     '--show-rc',
+     '--compression lz4',
+     '--exclude-caches'
+    ],
+    excludes: [
+      '/home/coop/.ecryptfs/*',
+      '/home/.ecryptfs/*',
+      '/home/coop/.cache/*',
+      '/home/coop/.dbus',
+      '/home/coop/.local/share/gvfs-metadata/home',
+      '/home/coop/.gvfs',
+    ],
+    repository: '/mnt/Backup2/BorgBackup',
+    // archivePrefix: '',
+    foldersToBackup: [
+      '/home'
+    ],
+    showNotification: true,
+    // To disable logging, set log:false
+    // Logging type can be either 'file' or 'email'
+    // log: {
+    //   type: 'file',
+    //   destination: '/home/coop/.config/borg/logs/output.log'
+    // },
+    log: {
+       type: 'email',
+    }
+  }
+}

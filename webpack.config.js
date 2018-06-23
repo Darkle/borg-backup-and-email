@@ -5,7 +5,7 @@ const nodeExternals = require('webpack-node-externals')
 
 const projectDir = path.resolve(__dirname)
 const entryFile = path.join(projectDir, 'index.lsc')
-const ISDEV = (process.env.NODE_ENV && process.env.NODE_ENV !== 'production')
+const ISDEV = process.env.NODE_ENV !== 'production'
 
 console.log('ISDEV: ', ISDEV)
 console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
@@ -31,6 +31,10 @@ const webpackconfig = {
         options: {
           sourceMap: ISDEV
         }
+      },
+      {
+        test: /\.json5$/,
+        loader: 'json5-loader'
       },
     ]
   },

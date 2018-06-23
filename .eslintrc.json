@@ -8,6 +8,9 @@
     "node": true,
     "es6": true
   },
+  "globals": {
+    "ISDEV": true
+  },
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",

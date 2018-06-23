@@ -1,3 +1,60 @@
-
 if !process.env.NODE_ENV: process.env.NODE_ENV = "production"
-console.log('asdaaasasdasd')
+require('dotenv').config()
+import os from 'os'
+import { promisify } from 'util'
+import { exec } from 'child_process'
+
+import dateFormat from 'dateformat'
+import notifier from 'node-notifier'
+import { stringify } from 'q-i'
+import mailgunjs from 'mailgun-js'
+
+import { create } from './borg-config.json5'
+
+pExec = promisify(exec)
+mailgun = mailgunjs({
+  domain: process.env.MAILGUN_DOMAIN,
+  apiKey: process.env.MAILGUN_PRIVATE_APIKEY
+})
+mailOptions = {
+  from: 'Borg Backup <borg@localhost.dev>',
+  to: process.env.DESTINATION_EMAIL,
+}
+borgCreateParams = [
+  'create'
+  ...create.options,
+  ...for elem exclude in create.excludes: [ `--exclude "${ exclude }"` ],
+  `${ create.repository }::${ create.archivePrefix || os.hostname() }-${ dateFormat(new Date(), 'yyyy-mm-dd-HHMMss') }`,
+  ...create.foldersToBackup,
+]
+logType = create?.log?.type
+
+if logType === 'file': borgCreateParams.push(` >> ${ create.log.destination } 2>&1`)
+
+pExec(`borg ${ borgCreateParams.join(' ') }`)
+  .then(notify)
+  .catch(notify)
+  .then(sendEmail)
+
+sendEmail(result) ->
+  if logType !== 'email': return
+  mailgun.messages().send({
+    ...mailOptions,
+    subject: generateMessageTitle(result),
+    html: `<pre> ${ stringify(result) } </pre>`
+  }, err -> if err: console.error(err))
+
+notify(result) ->
+  if ISDEV: console.log(result)
+  notifier.notify({
+    title: generateMessageTitle(result),
+    message: result?.message
+  })
+  result
+
+isError(err) -> err instanceof Error
+
+generateMessageTitle(result) ->
+  if !isError(result): 'Borg Backup Completed Successfully'
+  else: 'There Was An Error With The Borg Backup'
+
