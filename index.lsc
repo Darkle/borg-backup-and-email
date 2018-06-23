@@ -25,11 +25,11 @@ borgCreateParams = [
   ...create.options,
   ...for elem exclude in create.excludes: [ `--exclude "${ exclude }"` ],
   `${ create.repository }::${ create.archivePrefix || os.hostname() }-${ prettyDate() }`,
-  ...create.foldersToBackup,
+  ...for elem folders in create.foldersToBackup: [ `"${ folders }"` ],
 ]
 logType = create.log?.type
 
-if logType === 'file': borgCreateParams.push(` >> ${ create.log.destination } 2>&1`)
+if logType === 'file': borgCreateParams.push(` >> "${ create.log.destination }" 2>&1`)
 
 pExec(`borg ${ borgCreateParams.join(' ') }`)
   .then(notify)

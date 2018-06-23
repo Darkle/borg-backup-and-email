@@ -21,7 +21,9 @@
     repository: '/mnt/Backup2/BorgBackup',
     // archivePrefix: '',
     foldersToBackup: [
-      '/home'
+      '/home',
+      '/mnt/1TBInternal/Coding Music',
+      '/mnt/1TBInternal/DownloadsOn1TB/Coding Tutorials & Books',
     ],
     showNotification: true,
     // To disable logging, set log:false
