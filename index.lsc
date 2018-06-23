@@ -38,11 +38,14 @@ pExec(`borg ${ borgCreateParams.join(' ') }`)
 
 sendEmail(result) ->
   if logType !== 'email': return
-  mailgun.messages().send({
-    ...mailOptions,
-    subject: generateMessageTitle(result),
-    html: `<pre> ${ stringify(result) } </pre>`
-  }, err -> if err: console.error(err))
+  mailgun.messages().send(
+    {
+      ...mailOptions,
+      subject: generateMessageTitle(result),
+      html: `<pre> ${ stringify(result) } </pre>`
+    },
+    err -> if err: console.error(err)
+  )
 
 notify(result) ->
   if ISDEV: console.log(result)
@@ -55,6 +58,6 @@ notify(result) ->
 isError(err) -> err instanceof Error
 
 generateMessageTitle(result) ->
-  if !isError(result): 'Borg Backup Completed Successfully'
-  else: 'There Was An Error With The Borg Backup'
+  if !isError(result): 'Borg Backup Completed Successfully 😎'
+  else: 'Borg Backup Encountered An Error 💩'
 
