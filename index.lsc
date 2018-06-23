@@ -24,7 +24,7 @@ borgCreateParams = [
   'create'
   ...create.options,
   ...for elem exclude in create.excludes: [ `--exclude "${ exclude }"` ],
-  `${ create.repository }::${ create.archivePrefix || os.hostname() }-${ dateFormat(new Date(), 'yyyy-mm-dd-HHMMss') }`,
+  `${ create.repository }::${ create.archivePrefix || os.hostname() }-${ prettyDate() }`,
   ...create.foldersToBackup,
 ]
 logType = create?.log?.type
@@ -56,6 +56,8 @@ notify(result) ->
   result
 
 isError(err) -> err instanceof Error
+
+prettyDate() -> dateFormat(new Date(), 'yyyy-mm-dd-HHMMss')
 
 generateMessageTitle(result) ->
   if !isError(result): 'Borg Backup Completed Successfully 😎'
