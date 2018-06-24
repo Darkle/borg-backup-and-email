@@ -17,9 +17,10 @@
       '/home/coop/.dbus',
       '/home/coop/.local/share/gvfs-metadata/home',
       '/home/coop/.gvfs',
+      '/home/coop/.local/share/recently-used.xbel',
     ],
     repository: '/mnt/Backup2/BorgBackup',
-    // archivePrefix: '',
+    prefix: null,
     foldersToBackup: [
       '/home',
       '/mnt/1TBInternal/Coding Music',
@@ -35,5 +36,16 @@
     log: {
        type: 'email',
     }
+  },
+  prune: {
+    options: [
+      '--show-rc',
+      '--stats',
+    ],
+    repository: '/mnt/Backup2/BorgBackup',
+    prefix: null,
+    keepDaily: 7,
+    keepWeekly: 2,
+    keepMonthly: 1,
   }
 }

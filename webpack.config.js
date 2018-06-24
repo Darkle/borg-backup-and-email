@@ -18,7 +18,7 @@ console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
 */
 const webpackconfig = {
   mode: process.env.NODE_ENV,
-  devtool: ISDEV ? 'eval-source-map' : 'none',
+  devtool: ISDEV ? 'source-map' : 'none',
   context: projectDir,
   module: {
     rules: [

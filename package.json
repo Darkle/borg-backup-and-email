@@ -31,12 +31,12 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "chalk": "^2.4.1",
-    "q-i": "^2.0.1",
     "dateformat": "^3.0.3",
     "dotenv": "^6.0.0",
     "json5": "^1.0.1",
     "mailgun-js": "^0.18.1",
-    "node-notifier": "^5.2.1"
+    "node-notifier": "^5.2.1",
+    "p-reduce": "^1.0.0",
+    "signal-exit": "^3.0.2"
   }
 }

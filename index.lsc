@@ -2,16 +2,19 @@ if !process.env.NODE_ENV: process.env.NODE_ENV = "production"
 require('dotenv').config()
 import os from 'os'
 import { promisify } from 'util'
-import { exec } from 'child_process'
+import { exec, execFileSync } from 'child_process'
 
 import dateFormat from 'dateformat'
 import notifier from 'node-notifier'
-import { stringify } from 'q-i'
 import mailgunjs from 'mailgun-js'
+import pReduce from 'p-reduce'
+import onExit from 'signal-exit'
 
-import { create } from './borg.config.json5'
+import { create, prune } from './borg.config.json5'
 
 pExec = promisify(exec)
+date = dateFormat(new Date(), 'yyyy-mm-dd-HHMMss')
+osHostname = os.hostname()
 mailgun = mailgunjs({
   domain: process.env.MAILGUN_DOMAIN,
   apiKey: process.env.MAILGUN_PRIVATE_APIKEY
@@ -21,20 +24,37 @@ mailOptions = {
   to: process.env.DESTINATION_EMAIL,
 }
 borgCreateParams = [
-  'create'
   ...create.options,
   ...for elem exclude in create.excludes: [ `--exclude "${ exclude }"` ],
-  `${ create.repository }::${ create.archivePrefix || os.hostname() }-${ prettyDate() }`,
+  `${ create.repository }::${ create.prefix || osHostname }-${ date }`,
   ...for elem folders in create.foldersToBackup: [ `"${ folders }"` ],
+]
+borgPruneParams = [
+  ...prune.options,
+  `--prefix ${ prune.prefix || osHostname }-`,
+  `--keep-daily ${ prune.keepDaily }`,
+  `--keep-weekly ${ prune.keepWeekly }`,
+  `--keep-monthly ${ prune.keepMonthly }`,
+  prune.repository
 ]
 logType = create.log?.type
 
 if logType === 'file': borgCreateParams.push(` >> "${ create.log.destination }" 2>&1`)
 
-pExec(`borg ${ borgCreateParams.join(' ') }`)
-  .then(notify)
-  .catch(notify)
-  .then(sendEmail)
+/*****
+* Adding large maxBuffer in case of verbose logging and lotsa files.
+*/
+pReduce(
+  [
+    pExec(`borg create ${ borgCreateParams.join(' ') }`, {maxBuffer: Infinity})
+    pExec(`borg prune ${ borgPruneParams.join(' ') }`, {maxBuffer: Infinity}),
+  ],
+  joinExecResultsMessages,
+  ''
+)
+.catch(identity)
+.then(notify)
+.then(sendEmail)
 
 sendEmail(result) ->
   if logType !== 'email': return
@@ -42,24 +62,50 @@ sendEmail(result) ->
     {
       ...mailOptions,
       subject: generateMessageTitle(result),
-      html: `<pre> ${ stringify(result) } </pre>`
+      ...generateMessageText(result)
     },
     err -> if err: console.error(err)
   )
 
 notify(result) ->
-  if ISDEV: console.log(result)
-  notifier.notify({
-    title: generateMessageTitle(result),
-    message: result?.message
-  })
+  messageTitle = generateMessageTitle(result)
+  if !isError(result): notifier.notify(messageTitle)
+  else:
+    notifier.notify({
+      title: messageTitle,
+      message: result?.message
+    })
   result
 
 isError(err) -> err instanceof Error
+identity(param) -> param
 
-prettyDate() -> dateFormat(new Date(), 'yyyy-mm-dd-HHMMss')
+/*****
+* For some reason the success message arrives in stderr. ¯\_(ツ)_/¯
+*/
+joinExecResultsMessages(totalMessage, result, index) ->
+  borgAction = if index === 0: 'BACKUP' else: 'PRUNE'
+  return `${ totalMessage }\n BORG ${ borgAction } RESULTS: \n${ result.stderr }`
+
 
 generateMessageTitle(result) ->
   if isError(result): 'Borg Backup Encountered An Error 💩'
   else: 'Borg Backup Completed Successfully 😎'
 
+
+generateMessageText(result) ->
+  if isError(result):
+    return { html: `<pre> ${ JSON.stringify(result) } </pre>` }
+  else:
+    { text: result }
+
+onExit(() => {
+  execFileSync('borg', ['break-lock', create.repository])
+})
+
+process.on('unhandledRejection', bailOnFatalError)
+process.on('uncaughtException', bailOnFatalError)
+
+bailOnFatalError(err):void ->
+  console.error(err)
+  process.exit(1)
