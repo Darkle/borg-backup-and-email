@@ -81,16 +81,17 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./index.lsc");
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
-/******/ ({
+/******/ ([
+/* 0 */
+/***/ (function(module, exports) {
 
-/***/ "./borg.config.json5":
-/*!***************************!*\
-  !*** ./borg.config.json5 ***!
-  \***************************/
-/*! no static exports found */
+module.exports = require("dotenv");
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -136,12 +137,61 @@ module.exports = {
 }
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports) {
 
-/***/ "./index.lsc":
-/*!*******************!*\
-  !*** ./index.lsc ***!
-  \*******************/
-/*! no static exports found */
+module.exports = require("signal-exit");
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+module.exports = require("p-reduce");
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = require("mailgun-js");
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = require("node-notifier");
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = require("dateformat");
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+module.exports = require("child_process");
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+module.exports = require("util");
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+module.exports = require("os");
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -151,40 +201,46 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _create$log, _ref2;
 
-var _os = __webpack_require__(/*! os */ "os");
+var _path = __webpack_require__(10);
+
+var _path2 = _interopRequireDefault(_path);
+
+var _os = __webpack_require__(9);
 
 var _os2 = _interopRequireDefault(_os);
 
-var _util = __webpack_require__(/*! util */ "util");
+var _util = __webpack_require__(8);
 
-var _child_process = __webpack_require__(/*! child_process */ "child_process");
+var _child_process = __webpack_require__(7);
 
-var _dateformat = __webpack_require__(/*! dateformat */ "dateformat");
+var _dateformat = __webpack_require__(6);
 
 var _dateformat2 = _interopRequireDefault(_dateformat);
 
-var _nodeNotifier = __webpack_require__(/*! node-notifier */ "node-notifier");
+var _nodeNotifier = __webpack_require__(5);
 
 var _nodeNotifier2 = _interopRequireDefault(_nodeNotifier);
 
-var _mailgunJs = __webpack_require__(/*! mailgun-js */ "mailgun-js");
+var _mailgunJs = __webpack_require__(4);
 
 var _mailgunJs2 = _interopRequireDefault(_mailgunJs);
 
-var _pReduce = __webpack_require__(/*! p-reduce */ "p-reduce");
+var _pReduce = __webpack_require__(3);
 
 var _pReduce2 = _interopRequireDefault(_pReduce);
 
-var _signalExit = __webpack_require__(/*! signal-exit */ "signal-exit");
+var _signalExit = __webpack_require__(2);
 
 var _signalExit2 = _interopRequireDefault(_signalExit);
 
-var _borgConfig = __webpack_require__(/*! ./borg.config.json5 */ "./borg.config.json5");
+var _borgConfig = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 if (false) {}
-__webpack_require__(/*! dotenv */ "dotenv").config();
+
+
+__webpack_require__(0).config({ path: _path2.default.join(__dirname, '.env') });
 
 
 const pExec = (0, _util.promisify)(_child_process.exec);
@@ -265,106 +321,5 @@ function bailOnFatalError(err) {
   process.exit(1);
 }
 
-/***/ }),
-
-/***/ "child_process":
-/*!********************************!*\
-  !*** external "child_process" ***!
-  \********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("child_process");
-
-/***/ }),
-
-/***/ "dateformat":
-/*!*****************************!*\
-  !*** external "dateformat" ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("dateformat");
-
-/***/ }),
-
-/***/ "dotenv":
-/*!*************************!*\
-  !*** external "dotenv" ***!
-  \*************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("dotenv");
-
-/***/ }),
-
-/***/ "mailgun-js":
-/*!*****************************!*\
-  !*** external "mailgun-js" ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("mailgun-js");
-
-/***/ }),
-
-/***/ "node-notifier":
-/*!********************************!*\
-  !*** external "node-notifier" ***!
-  \********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("node-notifier");
-
-/***/ }),
-
-/***/ "os":
-/*!*********************!*\
-  !*** external "os" ***!
-  \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("os");
-
-/***/ }),
-
-/***/ "p-reduce":
-/*!***************************!*\
-  !*** external "p-reduce" ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("p-reduce");
-
-/***/ }),
-
-/***/ "signal-exit":
-/*!******************************!*\
-  !*** external "signal-exit" ***!
-  \******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("signal-exit");
-
-/***/ }),
-
-/***/ "util":
-/*!***********************!*\
-  !*** external "util" ***!
-  \***********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("util");
-
 /***/ })
-
-/******/ });
-//# sourceMappingURL=index-compiled.js.map
+/******/ ]);

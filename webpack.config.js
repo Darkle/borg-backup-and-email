@@ -38,6 +38,9 @@ const webpackconfig = {
       },
     ]
   },
+  optimization: {
+    minimize: false
+  },
   resolve: {
     extensions: ['.lsc', '.js']
   },

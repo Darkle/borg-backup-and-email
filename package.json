@@ -7,6 +7,7 @@
     "ww": "cross-env NODE_ENV=development webpack --watch",
     "startDev": "cross-env NODE_ENV=development node ./index-compiled.js",
     "debug": "cross-env NODE_ENV=development node --inspect-brk index-compiled.js",
+    "build": "cross-env NODE_ENV=production webpack",
     "start": "cross-env NODE_ENV=production node ./index-compiled.js"
   },
   "repository": {

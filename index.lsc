@@ -1,5 +1,5 @@
 if !process.env.NODE_ENV: process.env.NODE_ENV = "production"
-require('dotenv').config()
+import path from 'path'
 import os from 'os'
 import { promisify } from 'util'
 import { exec, execFileSync } from 'child_process'
@@ -10,6 +10,7 @@ import mailgunjs from 'mailgun-js'
 import pReduce from 'p-reduce'
 import onExit from 'signal-exit'
 
+require('dotenv').config({path: path.join(__dirname, '.env')})
 import { create, prune } from './borg.config.json5'
 
 pExec = promisify(exec)
