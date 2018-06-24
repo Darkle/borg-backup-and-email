@@ -56,6 +56,13 @@ pReduce(
 .then(notify)
 .then(sendEmail)
 
+/*****
+* For some reason the success message arrives in stderr. ¯\_(ツ)_/¯
+*/
+joinExecResultsMessages(totalMessage, result, index) ->
+  borgAction = if index === 0: 'BACKUP' else: 'PRUNE'
+  return `${ totalMessage }\n BORG ${ borgAction } RESULTS: \n${ result.stderr }`
+
 sendEmail(result) ->
   if logType !== 'email': return
   mailgun.messages().send(
@@ -77,27 +84,18 @@ notify(result) ->
     })
   result
 
-isError(err) -> err instanceof Error
-identity(param) -> param
-
-/*****
-* For some reason the success message arrives in stderr. ¯\_(ツ)_/¯
-*/
-joinExecResultsMessages(totalMessage, result, index) ->
-  borgAction = if index === 0: 'BACKUP' else: 'PRUNE'
-  return `${ totalMessage }\n BORG ${ borgAction } RESULTS: \n${ result.stderr }`
-
-
 generateMessageTitle(result) ->
   if isError(result): 'Borg Backup Encountered An Error 💩'
   else: 'Borg Backup Completed Successfully 😎'
-
 
 generateMessageText(result) ->
   if isError(result):
     return { html: `<pre> ${ JSON.stringify(result) } </pre>` }
   else:
     { text: result }
+
+isError(err) -> err instanceof Error
+identity(param) -> param
 
 onExit(() => {
   execFileSync('borg', ['break-lock', create.repository])

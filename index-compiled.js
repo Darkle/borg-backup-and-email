@@ -220,7 +220,13 @@ if (logType === 'file') borgCreateParams.push(` >> "${_borgConfig.create.log.des
 */
 (0, _pReduce2.default)([pExec(`borg create ${borgCreateParams.join(' ')}`, { maxBuffer: Infinity }), pExec(`borg prune ${borgPruneParams.join(' ')}`, { maxBuffer: Infinity })], joinExecResultsMessages, '').catch(identity).then(notify).then(sendEmail);
 
-function sendEmail(result) {
+/*****
+* For some reason the success message arrives in stderr. ¯\_(ツ)_/¯
+*/
+function joinExecResultsMessages(totalMessage, result, index) {
+  const borgAction = index === 0 ? 'BACKUP' : 'PRUNE';
+  return `${totalMessage}\n BORG ${borgAction} RESULTS: \n${result.stderr}`;
+}function sendEmail(result) {
   if (logType !== 'email') return;
   return mailgun.messages().send(_extends({}, mailOptions, {
     subject: generateMessageTitle(result)
@@ -235,16 +241,6 @@ function sendEmail(result) {
       message: result == null ? void 0 : result.message
     });
   }return result;
-}function isError(err) {
-  return err instanceof Error;
-}function identity(param) {
-  return param;
-} /*****
-  * For some reason the success message arrives in stderr. ¯\_(ツ)_/¯
-  */
-function joinExecResultsMessages(totalMessage, result, index) {
-  const borgAction = index === 0 ? 'BACKUP' : 'PRUNE';
-  return `${totalMessage}\n BORG ${borgAction} RESULTS: \n${result.stderr}`;
 }function generateMessageTitle(result) {
   if (isError(result)) return 'Borg Backup Encountered An Error 💩';else return 'Borg Backup Completed Successfully 😎';
 }function generateMessageText(result) {
@@ -253,6 +249,10 @@ function joinExecResultsMessages(totalMessage, result, index) {
   } else {
     return { text: result };
   }
+}function isError(err) {
+  return err instanceof Error;
+}function identity(param) {
+  return param;
 }(0, _signalExit2.default)(() => {
   return (0, _child_process.execFileSync)('borg', ['break-lock', _borgConfig.create.repository]);
 });
