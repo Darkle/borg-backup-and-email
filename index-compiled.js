@@ -232,8 +232,8 @@ const mailOptions = {
   from: 'Borg Backup <borg@localhost.dev>',
   to: process.env.DESTINATION_EMAIL
   /*****
-  * We always use '--show-rc' because we check the exit/return code to check if
-  * borg terminated with an error.
+  * We always use '--show-rc' because we check the borg return code message
+  * to see if borg terminated with an error.
   */
 };const borgCreateParams = (() => {
   var _ref;
