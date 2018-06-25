@@ -266,12 +266,7 @@ function notifyAndEmail(er, stdout, stderr) {
   showDesktopNotification(messageTitle, stderr);
   return sendEmail(messageTitle, stderr);
 }function checkIfErrorOccured(result) {
-  return !!(() => {
-    const _arr4 = [];for (let _arr5 = result.split('\n'), _i3 = 0, _len3 = _arr5.length; _i3 < _len3; _i3++) {
-      const line = _arr5[_i3];
-      if (line.startsWith('terminating with error status') && !line.endsWith('0')) _arr4.push(line);
-    }return _arr4;
-  })().length;
+  return result.includes('terminating with error status,');
 }function sendEmail(messageTitle, messageText) {
   if (logType !== 'email') return;
   return mailgun.messages().send(_extends({}, mailOptions, {

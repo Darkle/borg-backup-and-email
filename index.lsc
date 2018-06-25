@@ -57,9 +57,7 @@ notifyAndEmail(er, stdout, stderr) ->
   sendEmail(messageTitle, stderr)
 
 checkIfErrorOccured(result) ->
-  !![ ...for elem line in result.split('\n'):
-      if line.startsWith('terminating with error status') && !line.endsWith('0'): [line]
-  ].length
+  result.includes('terminating with error status,')
 
 sendEmail(messageTitle, messageText) ->
   if logType !== 'email': return
