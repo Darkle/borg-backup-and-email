@@ -20,14 +20,20 @@ mailOptions = {
   from: 'Borg Backup <borg@localhost.dev>',
   to: process.env.DESTINATION_EMAIL,
 }
+/*****
+* We always use '--show-rc' because we check the exit/return code to check if
+* borg terminated with an error.
+*/
 borgCreateParams = [
   ...create.options,
+  '--show-rc',
   ...for elem exclude in create.excludes: [ `--exclude "${ exclude }"` ],
   `${ create.repository }::${ create.prefix || osHostname }-${ date }`,
   ...for elem folders in create.foldersToBackup: [ `"${ folders }"` ],
 ]
 borgPruneParams = [
   ...prune.options,
+  '--show-rc',
   `--prefix ${ prune.prefix || osHostname }-`,
   `--keep-daily ${ prune.keepDaily }`,
   `--keep-weekly ${ prune.keepWeekly }`,

@@ -6,7 +6,6 @@
     //  '--filter AME',
     //  '--list',
      '--stats',
-     '--show-rc',
      '--compression lz4',
      '--exclude-caches'
     ],
@@ -39,7 +38,6 @@
   },
   prune: {
     options: [
-      '--show-rc',
       '--stats',
     ],
     repository: '/mnt/Backup2/BorgBackup',

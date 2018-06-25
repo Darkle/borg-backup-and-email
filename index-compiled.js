@@ -98,7 +98,6 @@ module.exports = {
 	"create": {
 		"options": [
 			"--stats",
-			"--show-rc",
 			"--compression lz4",
 			"--exclude-caches"
 		],
@@ -125,7 +124,6 @@ module.exports = {
 	},
 	"prune": {
 		"options": [
-			"--show-rc",
 			"--stats"
 		],
 		"repository": "/mnt/Backup2/BorgBackup",
@@ -233,11 +231,14 @@ const mailgun = (0, _mailgunJs2.default)({
 const mailOptions = {
   from: 'Borg Backup <borg@localhost.dev>',
   to: process.env.DESTINATION_EMAIL
-};
-const borgCreateParams = (() => {
+  /*****
+  * We always use '--show-rc' because we check the exit/return code to check if
+  * borg terminated with an error.
+  */
+};const borgCreateParams = (() => {
   var _ref;
 
-  const _arr = [...(_ref = _borgConfig.create.options, _ref === void 0 ? [] : _ref)];
+  const _arr = [...(_ref = _borgConfig.create.options, _ref === void 0 ? [] : _ref), '--show-rc'];
 
   for (let _arr2 = _borgConfig.create.excludes, _i = 0, _len = _arr2.length; _i < _len; _i++) {
     const exclude = _arr2[_i];_arr.push(`--exclude "${exclude}"`);
@@ -246,7 +247,7 @@ const borgCreateParams = (() => {
     const folders = _arr3[_i2];_arr.push(`"${folders}"`);
   }return _arr;
 })();
-const borgPruneParams = [...(_ref2 = _borgConfig.prune.options, _ref2 === void 0 ? [] : _ref2), `--prefix ${_borgConfig.prune.prefix || osHostname}-`, `--keep-daily ${_borgConfig.prune.keepDaily}`, `--keep-weekly ${_borgConfig.prune.keepWeekly}`, `--keep-monthly ${_borgConfig.prune.keepMonthly}`, _borgConfig.prune.repository];
+const borgPruneParams = [...(_ref2 = _borgConfig.prune.options, _ref2 === void 0 ? [] : _ref2), '--show-rc', `--prefix ${_borgConfig.prune.prefix || osHostname}-`, `--keep-daily ${_borgConfig.prune.keepDaily}`, `--keep-weekly ${_borgConfig.prune.keepWeekly}`, `--keep-monthly ${_borgConfig.prune.keepMonthly}`, _borgConfig.prune.repository];
 const logType = (_create$log = _borgConfig.create.log) == null ? void 0 : _create$log.type;
 
 if (logType === 'file') borgCreateParams.push(` >> "${_borgConfig.create.log.destination}" 2>&1`);
