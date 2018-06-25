@@ -42,10 +42,13 @@ if logType === 'file': borgCreateParams.push(` >> "${ create.log.destination }" 
 * Adding large maxBuffer in case of verbose logging and lotsa files.
 * Promises execute straight away, so can't use them here.
 */
-exec.quiet([
-  `borg create ${ borgCreateParams.join(' ') }`,
-  `borg prune ${ borgPruneParams.join(' ') }`,
-  ], notifyAndEmail)
+exec.quiet(
+  [
+    `borg create ${ borgCreateParams.join(' ') }`,
+    `borg prune ${ borgPruneParams.join(' ') }`,
+  ],
+  notifyAndEmail
+)
 
 /*****
 * For some reason the result message always arrives on stderr regardless
