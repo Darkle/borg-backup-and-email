@@ -21,7 +21,7 @@ mailOptions = {
   to: process.env.DESTINATION_EMAIL,
 }
 /*****
-* We always use '--show-rc' because we check the exit/return code to check if
+* We always use '--show-rc' because we check the borg return code to check if
 * borg terminated with an error.
 */
 borgCreateParams = [
