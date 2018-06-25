@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -140,13 +140,13 @@ module.exports = {
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = require("signal-exit");
+module.exports = require("executive");
 
 /***/ }),
 /* 3 */
 /***/ (function(module, exports) {
 
-module.exports = require("p-reduce");
+module.exports = require("signal-exit");
 
 /***/ }),
 /* 4 */
@@ -170,28 +170,16 @@ module.exports = require("dateformat");
 /* 7 */
 /***/ (function(module, exports) {
 
-module.exports = require("child_process");
+module.exports = require("os");
 
 /***/ }),
 /* 8 */
 /***/ (function(module, exports) {
 
-module.exports = require("util");
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-module.exports = require("os");
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
 module.exports = require("path");
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -201,17 +189,13 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _create$log, _ref2;
 
-var _path = __webpack_require__(10);
+var _path = __webpack_require__(8);
 
 var _path2 = _interopRequireDefault(_path);
 
-var _os = __webpack_require__(9);
+var _os = __webpack_require__(7);
 
 var _os2 = _interopRequireDefault(_os);
-
-var _util = __webpack_require__(8);
-
-var _child_process = __webpack_require__(7);
 
 var _dateformat = __webpack_require__(6);
 
@@ -225,25 +209,21 @@ var _mailgunJs = __webpack_require__(4);
 
 var _mailgunJs2 = _interopRequireDefault(_mailgunJs);
 
-var _pReduce = __webpack_require__(3);
-
-var _pReduce2 = _interopRequireDefault(_pReduce);
-
-var _signalExit = __webpack_require__(2);
+var _signalExit = __webpack_require__(3);
 
 var _signalExit2 = _interopRequireDefault(_signalExit);
+
+var _executive = __webpack_require__(2);
+
+var _executive2 = _interopRequireDefault(_executive);
 
 var _borgConfig = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-if (false) {}
-
-
 __webpack_require__(0).config({ path: _path2.default.join(__dirname, '.env') });
 
 
-const pExec = (0, _util.promisify)(_child_process.exec);
 const date = (0, _dateformat2.default)(new Date(), 'yyyy-mm-dd-HHMMss');
 const osHostname = _os2.default.hostname();
 const mailgun = (0, _mailgunJs2.default)({
@@ -273,44 +253,45 @@ if (logType === 'file') borgCreateParams.push(` >> "${_borgConfig.create.log.des
 
 /*****
 * Adding large maxBuffer in case of verbose logging and lotsa files.
+* Promises execute straight away, so can't use them here.
 */
-(0, _pReduce2.default)([pExec(`borg create ${borgCreateParams.join(' ')}`, { maxBuffer: Infinity }), pExec(`borg prune ${borgPruneParams.join(' ')}`, { maxBuffer: Infinity })], joinExecResultsMessages, '').catch(identity).then(notify).then(sendEmail);
+_executive2.default.quiet([`borg create ${borgCreateParams.join(' ')}`, `borg prune ${borgPruneParams.join(' ')}`], notifyAndEmail);
 
 /*****
-* For some reason the success message arrives in stderr. ¯\_(ツ)_/¯
+* For some reason the result message always arrives on stderr regardless
+* of failure or success. ¯\_(ツ)_/¯
 */
-function joinExecResultsMessages(totalMessage, result, index) {
-  const borgAction = index === 0 ? 'BACKUP' : 'PRUNE';
-  return `${totalMessage}\n BORG ${borgAction} RESULTS: \n${result.stderr}`;
-}function sendEmail(result) {
+function notifyAndEmail(er, stdout, stderr) {
+  const messageTitle = generateMessageTitle(checkIfErrorOccured(stderr));
+  showDesktopNotification(messageTitle, stderr);
+  return sendEmail(messageTitle, stderr);
+}function checkIfErrorOccured(result) {
+  return !!(() => {
+    const _arr4 = [];for (let _arr5 = result.split('\n'), _i3 = 0, _len3 = _arr5.length; _i3 < _len3; _i3++) {
+      const line = _arr5[_i3];
+      if (line.startsWith('terminating with error status') && !line.endsWith('0')) _arr4.push(line);
+    }return _arr4;
+  })().length;
+}function sendEmail(messageTitle, messageText) {
   if (logType !== 'email') return;
   return mailgun.messages().send(_extends({}, mailOptions, {
-    subject: generateMessageTitle(result)
-  }, generateMessageText(result)), function (err) {
+    subject: messageTitle,
+    html: `<pre> ${messageText} </pre>`
+  }), function (err) {
     return err ? console.error(err) : void 0;
   });
-}function notify(result) {
-  const messageTitle = generateMessageTitle(result);
-  if (!isError(result)) _nodeNotifier2.default.notify(messageTitle);else {
-    _nodeNotifier2.default.notify({
-      title: messageTitle,
-      message: result == null ? void 0 : result.message
-    });
-  }return result;
-}function generateMessageTitle(result) {
-  if (isError(result)) return 'Borg Backup Encountered An Error 💩';else return 'Borg Backup Completed Successfully 😎';
-}function generateMessageText(result) {
-  if (isError(result)) {
-    return { html: `<pre> ${JSON.stringify(result)} </pre>` };
-  } else {
-    return { text: result };
-  }
-}function isError(err) {
-  return err instanceof Error;
-}function identity(param) {
-  return param;
-}(0, _signalExit2.default)(() => {
-  return (0, _child_process.execFileSync)('borg', ['break-lock', _borgConfig.create.repository]);
+}function showDesktopNotification(messageTitle, messageText) {
+  return _nodeNotifier2.default.notify({
+    title: messageTitle,
+    message: messageText
+  });
+}function generateMessageTitle(errorOccured) {
+  if (errorOccured) return 'Borg Backup Encountered An Error 💩';else return 'Borg Backup Completed Successfully 😎';
+} /*****
+  * Try to break lock on exit always in case of exit on error.
+  */
+(0, _signalExit2.default)(function () {
+  return (0, _executive2.default)(`borg break-lock ${_borgConfig.create.repository}`, { sync: true });
 });
 
 process.on('unhandledRejection', bailOnFatalError);

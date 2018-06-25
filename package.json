@@ -34,10 +34,10 @@
   "dependencies": {
     "dateformat": "^3.0.3",
     "dotenv": "^6.0.0",
+    "executive": "^1.6.3",
     "json5": "^1.0.1",
     "mailgun-js": "^0.18.1",
     "node-notifier": "^5.2.1",
-    "p-reduce": "^1.0.0",
     "signal-exit": "^3.0.2"
   }
 }

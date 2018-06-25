@@ -1,19 +1,15 @@
-if !process.env.NODE_ENV: process.env.NODE_ENV = "production"
 import path from 'path'
 import os from 'os'
-import { promisify } from 'util'
-import { exec, execFileSync } from 'child_process'
 
 import dateFormat from 'dateformat'
 import notifier from 'node-notifier'
 import mailgunjs from 'mailgun-js'
-import pReduce from 'p-reduce'
 import onExit from 'signal-exit'
+import exec from 'executive'
 
 require('dotenv').config({path: path.join(__dirname, '.env')})
 import { create, prune } from './borg.config.json5'
 
-pExec = promisify(exec)
 date = dateFormat(new Date(), 'yyyy-mm-dd-HHMMss')
 osHostname = os.hostname()
 mailgun = mailgunjs({
@@ -44,63 +40,52 @@ if logType === 'file': borgCreateParams.push(` >> "${ create.log.destination }" 
 
 /*****
 * Adding large maxBuffer in case of verbose logging and lotsa files.
+* Promises execute straight away, so can't use them here.
 */
-pReduce(
-  [
-    pExec(`borg create ${ borgCreateParams.join(' ') }`, {maxBuffer: Infinity})
-    pExec(`borg prune ${ borgPruneParams.join(' ') }`, {maxBuffer: Infinity}),
-  ],
-  joinExecResultsMessages,
-  ''
-)
-.catch(identity)
-.then(notify)
-.then(sendEmail)
+exec.quiet([
+  `borg create ${ borgCreateParams.join(' ') }`,
+  `borg prune ${ borgPruneParams.join(' ') }`,
+  ], notifyAndEmail)
 
 /*****
-* For some reason the success message arrives in stderr. ¯\_(ツ)_/¯
+* For some reason the result message always arrives on stderr regardless
+* of failure or success. ¯\_(ツ)_/¯
 */
-joinExecResultsMessages(totalMessage, result, index) ->
-  borgAction = if index === 0: 'BACKUP' else: 'PRUNE'
-  return `${ totalMessage }\n BORG ${ borgAction } RESULTS: \n${ result.stderr }`
+notifyAndEmail(er, stdout, stderr) ->
+  messageTitle = generateMessageTitle(checkIfErrorOccured(stderr))
+  showDesktopNotification(messageTitle, stderr)
+  sendEmail(messageTitle, stderr)
 
-sendEmail(result) ->
+checkIfErrorOccured(result) ->
+  !![ ...for elem line in result.split('\n'):
+      if line.startsWith('terminating with error status') && !line.endsWith('0'): [line]
+  ].length
+
+sendEmail(messageTitle, messageText) ->
   if logType !== 'email': return
   mailgun.messages().send(
     {
       ...mailOptions,
-      subject: generateMessageTitle(result),
-      ...generateMessageText(result)
+      subject: messageTitle,
+      html: `<pre> ${ messageText } </pre>`
     },
     err -> if err: console.error(err)
   )
 
-notify(result) ->
-  messageTitle = generateMessageTitle(result)
-  if !isError(result): notifier.notify(messageTitle)
-  else:
-    notifier.notify({
-      title: messageTitle,
-      message: result?.message
-    })
-  result
+showDesktopNotification(messageTitle, messageText) ->
+  notifier.notify({
+    title: messageTitle,
+    message: messageText
+  })
 
-generateMessageTitle(result) ->
-  if isError(result): 'Borg Backup Encountered An Error 💩'
+generateMessageTitle(errorOccured) ->
+  if errorOccured: 'Borg Backup Encountered An Error 💩'
   else: 'Borg Backup Completed Successfully 😎'
 
-generateMessageText(result) ->
-  if isError(result):
-    return { html: `<pre> ${ JSON.stringify(result) } </pre>` }
-  else:
-    { text: result }
-
-isError(err) -> err instanceof Error
-identity(param) -> param
-
-onExit(() => {
-  execFileSync('borg', ['break-lock', create.repository])
-})
+/*****
+* Try to break lock on exit always in case of exit on error.
+*/
+onExit(() -> exec(`borg break-lock ${ create.repository }`, {sync: true}))
 
 process.on('unhandledRejection', bailOnFatalError)
 process.on('uncaughtException', bailOnFatalError)
