@@ -299,7 +299,7 @@ process.on('uncaughtException', bailOnFatalError);
 
 function bailOnFatalError(err) {
   console.error(err);
-  process.exit(1);
+  return process.exit(1);
 }
 
 /***/ })

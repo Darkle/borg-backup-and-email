@@ -90,6 +90,6 @@ onExit(() -> exec(`borg break-lock ${ create.repository }`, {sync: true}))
 process.on('unhandledRejection', bailOnFatalError)
 process.on('uncaughtException', bailOnFatalError)
 
-bailOnFatalError(err):void ->
+bailOnFatalError(err) ->
   console.error(err)
   process.exit(1)
