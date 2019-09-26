@@ -7,8 +7,8 @@ const mailgunjs = require('mailgun-js')
 const onExit = require('signal-exit')
 const exec = require('executive')
 
-require('dotenv').config({path: path.join(__dirname, '.env')})
-const config = require('./borg.config.json5')
+require('dotenv').config()
+const { config } = require('./borg.config.js')
 
 const date = dateFormat(new Date(), 'yyyy-mm-dd-HHMMss')
 const osHostname = os.hostname()
@@ -27,9 +27,9 @@ const mailOptions = {
 const borgCreateParams = [
   ...config.create.options,
   '--show-rc',
-  ...generateExcludes(),
+  generateExcludes(),
   `${ config.create.repository }::${ config.create.prefix || osHostname }-${ date }`,
-  ...generateFoldersToBackup(),
+  generateFoldersToBackup(),
 ]
 const borgPruneParams = [
   ...config.prune.options,
@@ -40,16 +40,7 @@ const borgPruneParams = [
   `--keep-monthly ${ config.prune.keepMonthly }`,
   config.prune.repository
 ]
-const logType = config.create.log.type
 
-if(logType === 'file'){
-  borgCreateParams.push(` >> "${ config.create.log.destination }" 2>&1`)
-}
-
-/*****
-* Adding large maxBuffer in case of verbose logging and lotsa files.
-* Promises execute straight away, so can't use them here.
-*/
 exec.quiet(
   [
     `borg create ${ borgCreateParams.join(' ') }`,
@@ -60,20 +51,20 @@ exec.quiet(
 
 function generateExcludes(){
   if(config.create.excludes.length < 1) return ''
-  return config.create.excludes.reduce((acc, curr) => {
-    `${acc} --exclude "${ exclude }"`
-  }, '')
+  return config.create.excludes.reduce((acc, curr) =>
+    `${acc} --exclude "${ curr }"`
+  , '')
 }
+
 function generateFoldersToBackup(){
-  if(config.create.excludes.length < 1) throw new Error('No folders to back up!')
-  return config.create.foldersToBackup.reduce((acc, curr) => {
-    `${acc} "${ exclude }"`
-  }, '')
+  if(config.create.foldersToBackup.length < 1) throw new Error('No folders to back up!')
+  return config.create.foldersToBackup.reduce((acc, curr) =>
+    `${acc} "${ curr }"`
+  , '')
 }
 
 /*****
-* For some reason the result message always arrives on stderr regardless
-* of failure or success. ¯\_(ツ)_/¯
+* Borg logs to stderr by default.
 */
 function notifyAndEmail(er, stdout, stderr){
   const messageTitle = generateMessageTitle(checkIfErrorOccured(stderr))
@@ -86,7 +77,6 @@ function checkIfErrorOccured(result){
 }
 
 function sendEmail(messageTitle, messageText){
-  if (logType !== 'email') return
   mailgun.messages().send(
     {
       ...mailOptions,
@@ -113,7 +103,7 @@ function generateMessageTitle(errorOccured){
 }
 
 /*****
-* Try to break lock on exit always in case of exit on error.
+* Try to always break lock on exit in case we exited because an error occured.
 */
 onExit(() => exec(`borg break-lock ${ config.create.repository }`, {sync: true}))
 

@@ -107,14 +107,6 @@ module.exports = {
     'no-lonely-if': 'error',
     'no-lone-blocks': 'error',
     'no-loop-func': 'error',
-    'no-magic-numbers': [
-      'error',
-      {
-        ignoreArrayIndexes: true,
-        enforceConst: true,
-        detectObjects: true,
-      }
-    ],
     'no-misleading-character-class': 'error',
     'no-mixed-operators': 'error',
     'no-mixed-requires': 'error',

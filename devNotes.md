@@ -19,3 +19,5 @@ Example cron:
 
 Note: borg may not be available to cron (it has limited paths), so you may need to add the path borg is installed to. In my case I have it installed to `/home/coop/.local/bin/`
 To find out where node and borg are installed just run `which borg` & `which node`
+
+To get the desktop notifications, you may need to install: `sudo apt install libnotify-bin`
