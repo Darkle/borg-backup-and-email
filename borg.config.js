@@ -2,7 +2,7 @@
 const config = {
   create: {
     options: [
-    '--debug',
+    // '--debug',
     // '--dry-run', //disable --stats if you enabled this
     //  '--filter AME',
     //  '--list',
