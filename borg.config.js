@@ -6,9 +6,9 @@ const config = {
     // '--dry-run', //disable --stats if you enabled this
     //  '--filter AME',
     //  '--list',
-     '--stats',
-     '--compression lz4',
-     '--exclude-caches'
+      '--stats',
+      '--compression zstd,22',
+      '--exclude-caches'
     ],
     excludes: [
       '/home/coop/.cache/*',
@@ -19,12 +19,11 @@ const config = {
       '/home/coop/.config/Mousepad',
       '/home/coop/.config/leafpad',
     ],
-    repository: '/media/coop/Backup/Borg-Backup',
+    repository: '/mnt/Backup_1/Borg-Backup/GeneralBackup',
     prefix: null,
     foldersToBackup: [
       '/home/coop',
-      '/media/coop/Media/Music',
-      '/media/coop/1TB_Internal/Coding Tutorials & Books',
+      '/mnt/Tutorials/Coding Tutorials & Books',
     ],
     showNotification: true,
   },
@@ -32,7 +31,7 @@ const config = {
     options: [
       '--stats',
     ],
-    repository: '/media/coop/Backup/Borg-Backup',
+    repository: '/mnt/Backup_1/Borg-Backup/GeneralBackup',
     prefix: null,
     keepDaily: 7,
     keepWeekly: 2,

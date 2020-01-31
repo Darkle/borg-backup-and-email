@@ -17,13 +17,13 @@
   },
   "homepage": "https://github.com/Darkle/borg-backup-and-email#readme",
   "devDependencies": {
-    "eslint": "^4.19.1"
+    "eslint": "^6.8.0"
   },
   "dependencies": {
     "dateformat": "^3.0.3",
     "dotenv": "^6.0.0",
     "executive": "^1.6.3",
-    "mailgun-js": "^0.18.1",
+    "mailgun-js": "^0.22.0",
     "node-notifier": "^5.2.1",
     "signal-exit": "^3.0.2"
   }

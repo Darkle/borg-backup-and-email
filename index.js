@@ -7,7 +7,7 @@ const mailgunjs = require('mailgun-js')
 const onExit = require('signal-exit')
 const exec = require('executive')
 
-require('dotenv').config()
+require('dotenv').config({ path: path.join(__dirname, '.env') })
 const { config } = require('./borg.config.js')
 
 const date = dateFormat(new Date(), 'yyyy-mm-dd-HHMMss')
