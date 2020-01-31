@@ -17,5 +17,5 @@ Note: this is not really intended to be used in production. Use this instead: ht
 9. Add your borg passphrase to the `.env` file: `BORG_PASSPHRASE=foo`
 
 ##### Checking things are backed up:
-*. Use https://borgbackup.readthedocs.io/en/stable/usage/list.html to list all the backups
-*. Use https://borgbackup.readthedocs.io/en/stable/usage/extract.html to extract and check the files are there
+  * Use https://borgbackup.readthedocs.io/en/stable/usage/list.html to list all the backups
+  * Use https://borgbackup.readthedocs.io/en/stable/usage/extract.html to extract and check the files are there
