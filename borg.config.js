@@ -7,7 +7,7 @@ const config = {
     //  '--filter AME',
     //  '--list',
       '--stats',
-      '--compression zstd,22',
+      '--compression lz4',
       '--exclude-caches'
     ],
     excludes: [
