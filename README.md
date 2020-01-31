@@ -1,6 +1,6 @@
 # borg-backup-and-email
 
-This runs the borg backup and notifies you via email on success and on error.
+This runs borg backup and notifies you via email whether the backup succeeded or failed.
 
 Note: this is not really intended to be used in production. Use this instead: https://github.com/vesparny/borgjs
 
